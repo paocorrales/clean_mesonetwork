@@ -1,0 +1,67 @@
+#!/bin/csh
+#################################################################
+# Csh Script to retrieve 19 online Data files of 'ds337.0',
+# total 1.63G. This script uses 'wget' to download data.
+#
+# Highlight this script by Select All, Copy and Paste it into a file;
+# make the file executable and run it on command line.
+#
+# You need pass in your password as a parameter to execute
+# this script; or you can set an environment variable RDAPSWD
+# if your Operating System supports it.
+#
+# Contact tcram@ucar.edu (Thomas Cram) for further assistance.
+#################################################################
+
+
+set pswd = $1
+if(x$pswd == x && `env | grep RDAPSWD` != '') then
+ set pswd = $RDAPSWD
+endif
+if(x$pswd == x) then
+ echo
+ echo Usage: $0 YourPassword
+ echo
+ exit 1
+endif
+set v = `wget -V |grep 'GNU Wget ' | cut -d ' ' -f 3`
+set a = `echo $v | cut -d '.' -f 1`
+set b = `echo $v | cut -d '.' -f 2`
+if(100 * $a + $b > 109) then
+ set opt = 'wget --no-check-certificate'
+else
+ set opt = 'wget'
+endif
+set opt1 = '-O Authentication.log --save-cookies auth.rda_ucar_edu --post-data'
+set opt2 = "email=paobcorrales@gmail.com&passwd=$pswd&action=login"
+$opt $opt1="$opt2" https://rda.ucar.edu/cgi-bin/login
+set opt1 = "-N --load-cookies auth.rda_ucar_edu"
+set opt2 = "$opt $opt1 http://rda.ucar.edu/data/ds337.0/"
+set filelist = ( \
+  prep48h/2018/prepbufr.gdas.20181119.t06z.nr.48h \
+  prep48h/2018/prepbufr.gdas.20181119.t12z.nr.48h \
+  prep48h/2018/prepbufr.gdas.20181119.t18z.nr.48h \
+  prep48h/2018/prepbufr.gdas.20181120.t00z.nr.48h \
+  prep48h/2018/prepbufr.gdas.20181120.t06z.nr.48h \
+  prep48h/2018/prepbufr.gdas.20181120.t12z.nr.48h \
+  prep48h/2018/prepbufr.gdas.20181120.t18z.nr.48h \
+  prep48h/2018/prepbufr.gdas.20181121.t00z.nr.48h \
+  prep48h/2018/prepbufr.gdas.20181121.t06z.nr.48h \
+  prep48h/2018/prepbufr.gdas.20181121.t12z.nr.48h \
+  prep48h/2018/prepbufr.gdas.20181121.t18z.nr.48h \
+  prep48h/2018/prepbufr.gdas.20181122.t00z.nr.48h \
+  prep48h/2018/prepbufr.gdas.20181122.t06z.nr.48h \
+  prep48h/2018/prepbufr.gdas.20181122.t12z.nr.48h \
+  prep48h/2018/prepbufr.gdas.20181122.t18z.nr.48h \
+  prep48h/2018/prepbufr.gdas.20181123.t00z.nr.48h \
+  prep48h/2018/prepbufr.gdas.20181123.t06z.nr.48h \
+  prep48h/2018/prepbufr.gdas.20181123.t12z.nr.48h \
+  prep48h/2018/prepbufr.gdas.20181123.t18z.nr.48h \
+)
+while($#filelist > 0)
+ set syscmd = "$opt2$filelist[1]"
+ echo "$syscmd ..."
+ $syscmd
+ shift filelist
+end
+
