@@ -4,7 +4,7 @@ library(data.table)
 library(metR)
 
 path <- "../mesonet/"
-date <- "20181118"
+date <- "20181123"
 
 filelist <- list.files(path = paste0(path, date))
 
@@ -33,13 +33,13 @@ for (i in filelist) {
   
   # Algo de QC
   
-  file <- file[ (LAT %between% c(-90, 0))  & LON < 0 & !is.na(PRSS) & PRSS > 200 ]
-  
+  # file <- file[ (LAT %between% c(-90, 0))  & LON < 0 & !is.na(PRSS) & PRSS > 200 ]
+  file <- file[ (LAT %between% c(-90, 0)) & LON < 0 ]
   file[is.na(file)] <- 10.0e10
   
   # guardo el archivo
   
-  fwrite(file, paste0("../out/", date, "/", i), na = '10.0e10', col.names = FALSE)
+  fwrite(file, paste0("../new/", date, "/", i), na = '10.0e10', col.names = FALSE)
   
 }
 
